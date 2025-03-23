@@ -53,7 +53,6 @@ class CandleSeries<T, D> extends FinancialSeriesBase<T, D> {
     super.dataLabelSettings,
     super.initialIsVisible,
     super.enableTooltip = true,
-    super.enableTrackball = true,
     super.animationDuration,
     super.borderWidth,
     super.selectionBehavior,
@@ -71,42 +70,7 @@ class CandleSeries<T, D> extends FinancialSeriesBase<T, D> {
     super.initialSelectedDataIndexes,
     super.showIndicationForSameValues = false,
     super.trendlines,
-    this.borderRadius = BorderRadius.zero,
-    super.width,
-    super.spacing,
   });
-
-  /// Customize the corners of the candle.
-  ///
-  /// Each corner can be customized with a specific value or with the same value for all corners.
-  ///
-  /// Defaults to `Radius.zero`.
-  ///
-  /// ```dart
-  /// Widget build(BuildContext context) {
-  ///   return SfCartesianChart(
-  ///      series: <CartesianSeries>[
-  ///            CandleSeries<_SalesData, String>(
-  ///         borderRadius: BorderRadius.all(Radius.circular(5))
-  ///       ),
-  ///     ],
-  ///   );
-  /// }
-  /// ```
-  final BorderRadius borderRadius;
-  @override
-  CandleSeriesRenderer<T, D> createRenderObject(BuildContext context) {
-    final CandleSeriesRenderer<T, D> renderer =
-        super.createRenderObject(context) as CandleSeriesRenderer<T, D>;
-    return renderer..borderRadius = borderRadius;
-  }
-
-  @override
-  void updateRenderObject(
-      BuildContext context, CandleSeriesRenderer<T, D> renderObject) {
-    super.updateRenderObject(context, renderObject);
-    renderObject.borderRadius = borderRadius;
-  }
 
   /// Create the candle series renderer.
   @override
@@ -123,14 +87,6 @@ class CandleSeries<T, D> extends FinancialSeriesBase<T, D> {
 /// Creates series renderer for candle series.
 class CandleSeriesRenderer<T, D> extends FinancialSeriesRendererBase<T, D>
     with SegmentAnimationMixin<T, D> {
-  BorderRadius get borderRadius => _borderRadius;
-  BorderRadius _borderRadius = BorderRadius.zero;
-  set borderRadius(BorderRadius value) {
-    if (value != _borderRadius) {
-      _borderRadius = value;
-    }
-  }
-
   @override
   void setData(int index, ChartSegment segment) {
     super.setData(index, segment);
@@ -244,8 +200,8 @@ class CandleSegment<T, D> extends ChartSegment {
   late num bottom;
 
   bool _isSameValue = false;
-  RRect? _oldSegmentRect;
-  RRect? segmentRect;
+  Rect? _oldSegmentRect;
+  Rect? segmentRect;
   final List<Offset> _oldPoints = <Offset>[];
 
   @override
@@ -286,7 +242,7 @@ class CandleSegment<T, D> extends ChartSegment {
       }
 
       _oldSegmentRect =
-          RRect.lerp(_oldSegmentRect, segmentRect, segmentAnimationFactor);
+          Rect.lerp(_oldSegmentRect, segmentRect, segmentAnimationFactor);
     } else {
       _oldPoints.clear();
       _oldSegmentRect = segmentRect;
@@ -316,21 +272,18 @@ class CandleSegment<T, D> extends ChartSegment {
     final double y1 = transformY(left, top);
     final double x2 = transformX(right, bottom);
     final double y2 = transformY(right, bottom);
-    final BorderRadius borderRadius = series._borderRadius;
-    segmentRect = toRRect(x1, y1, x2, y2, borderRadius);
-
-    _oldSegmentRect ??= toRRect(
+    segmentRect = Rect.fromLTRB(x1, y1, x2, y2);
+    _oldSegmentRect ??= Rect.fromLTRB(
       series.pointToPixelX(left, centerY),
       series.pointToPixelY(left, centerY),
       series.pointToPixelX(right, centerY),
       series.pointToPixelY(right, centerY),
-      borderRadius,
     );
 
     _isSameValue = top == bottom;
 
     if (_isSameValue) {
-      segmentRect = toRRect(x1, y1, x2, y2, borderRadius);
+      segmentRect = Rect.fromPoints(Offset(x1, y1), Offset(x2, y2));
     }
 
     if (series.showIndicationForSameValues && high == low) {
@@ -397,9 +350,8 @@ class CandleSegment<T, D> extends ChartSegment {
       primaryPos = series.localToGlobal(points[0]);
       secondaryPos = primaryPos;
     } else {
-      final Rect outerRect = segmentRect!.outerRect;
-      primaryPos = series.localToGlobal(outerRect.topCenter);
-      secondaryPos = series.localToGlobal(outerRect.bottomCenter);
+      primaryPos = series.localToGlobal(segmentRect!.topCenter);
+      secondaryPos = series.localToGlobal(segmentRect!.bottomCenter);
     }
     return ChartTooltipInfo<T, D>(
       primaryPosition: primaryPos,
@@ -472,20 +424,20 @@ class CandleSegment<T, D> extends ChartSegment {
       return;
     }
 
-    final RRect? paintRRect =
-        RRect.lerp(_oldSegmentRect, segmentRect, animationFactor);
+    final Rect? paintRect =
+        Rect.lerp(_oldSegmentRect, segmentRect, animationFactor);
     Paint paint = getFillPaint();
     if (paint.color != Colors.transparent && !_isSameValue) {
-      canvas.drawRRect(paintRRect!, paint);
+      canvas.drawRect(paintRect!, paint);
     }
 
     paint = getStrokePaint();
     if (paint.color != Colors.transparent && paint.strokeWidth > 0) {
       Path strokePath;
       if (_isSameValue) {
-        strokePath = Path()..addRRect(paintRRect!);
+        strokePath = Path()..addRect(paintRect!);
       } else {
-        strokePath = strokePathFromRRect(paintRRect, paint.strokeWidth);
+        strokePath = strokePathFromRect(paintRect, paint.strokeWidth);
       }
       drawDashes(canvas, series.dashArray, paint, path: strokePath);
 

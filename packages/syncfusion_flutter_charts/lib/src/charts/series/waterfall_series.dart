@@ -55,7 +55,6 @@ class WaterfallSeries<T, D> extends XyDataSeries<T, D> {
     super.borderGradient,
     this.borderRadius = BorderRadius.zero,
     super.enableTooltip = true,
-    super.enableTrackball = true,
     super.animationDuration,
     this.borderColor = Colors.transparent,
     super.trendlines,
@@ -348,9 +347,9 @@ class WaterfallConnectorLineSettings extends ConnectorLineSettings {
   /// Creating an argument constructor of WaterfallConnectorLineSettings class.
   const WaterfallConnectorLineSettings({
     double? width,
-    Color? color,
+    super.color,
     this.dashArray = const <double>[0, 0],
-  }) : super(color: color, width: width ?? 1);
+  }) : super(width: width ?? 1);
 
   /// Dashes of the waterfall chart connector line.
   ///

@@ -44,7 +44,6 @@ class HiloSeries<T, D> extends RangeSeriesBase<T, D> {
     super.dataLabelSettings,
     super.initialIsVisible,
     super.enableTooltip = true,
-    super.enableTrackball = true,
     super.animationDuration,
     super.borderWidth = 2,
     super.selectionBehavior,

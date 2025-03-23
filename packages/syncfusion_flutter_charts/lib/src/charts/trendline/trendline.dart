@@ -651,7 +651,7 @@ class RenderTrendlineStack extends RenderBox
   }
 
   List<LegendItem>? buildLegendItems(
-      int seriesIndex, LegendItemProviderMixin provider) {
+      int seriesIndex, LegendItemProvider provider) {
     final List<LegendItem> legendItems = <LegendItem>[];
     const int trendlineIndex = 0;
     TrendlineRenderer? child = firstChild;
@@ -2223,8 +2223,7 @@ class TrendlineRenderer extends RenderBox {
     }
   }
 
-  List<LegendItem>? buildLegendItems(
-      int index, LegendItemProviderMixin provider) {
+  List<LegendItem>? buildLegendItems(int index, LegendItemProvider provider) {
     if (isVisibleInLegend) {
       _legendItem = ChartLegendItem(
         text: name ?? _defaultTrendlineName(),
@@ -2290,7 +2289,7 @@ class TrendlineRenderer extends RenderBox {
   }
 
   ShapeMarkerType _toShapeMarkerType(LegendIconType iconType,
-      {LegendItemProviderMixin? legendItemProvider}) {
+      {LegendItemProvider? legendItemProvider}) {
     switch (iconType) {
       case LegendIconType.seriesType:
         if (legendItemProvider != null) {
@@ -2452,7 +2451,7 @@ class TrendlineRenderer extends RenderBox {
     }
 
     final Paint trendlinePaint = Paint()
-      ..color = color!.withValues(alpha: opacity)
+      ..color = color!.withOpacity(opacity)
       ..strokeWidth = width
       ..style = PaintingStyle.stroke;
 

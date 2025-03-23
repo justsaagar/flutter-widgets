@@ -16,7 +16,6 @@ import 'common/callbacks.dart';
 import 'common/chart_point.dart';
 import 'common/core_legend.dart' as core;
 import 'common/core_tooltip.dart';
-import 'common/element_widget.dart';
 import 'common/legend.dart';
 import 'common/title.dart';
 import 'indicators/technical_indicator.dart';
@@ -108,7 +107,7 @@ import 'utils/typedef.dart';
 class SfCartesianChart extends StatefulWidget {
   /// Creating an argument constructor of [SfCartesianChart] class.
   const SfCartesianChart({
-    Key? key,
+    super.key,
     this.backgroundColor,
     this.enableSideBySideSeriesPlacement = true,
     this.borderColor = Colors.transparent,
@@ -156,7 +155,7 @@ class SfCartesianChart extends StatefulWidget {
     this.title = const ChartTitle(),
     this.axes = const <ChartAxis>[],
     this.indicators = const <TechnicalIndicator>[],
-  }) : super(key: key);
+  });
 
   /// Customizes the chart title.
   ///
@@ -1364,8 +1363,8 @@ class SfCartesianChartState extends State<SfCartesianChart>
           trackballBuilderElement.findRenderObject();
       if (renderObject != null &&
           renderObject.attached &&
-          renderObject is CustomRenderConstrainedLayoutBuilder) {
-        renderObject.markNeedsBuild();
+          renderObject is RenderConstrainedLayoutBuilder) {
+        // renderObject.markNeedsBuild();
       }
     }
   }
@@ -1562,7 +1561,7 @@ class SfCartesianChartState extends State<SfCartesianChart>
                   widget.trackballBehavior!.builder != null)
                 TrackballBuilderOpacityWidget(
                   opacity: 1.0,
-                  child: CustomLayoutBuilder(
+                  child: LayoutBuilder(
                     key: _trackballBuilderKey,
                     builder:
                         (BuildContext context, BoxConstraints constraints) {

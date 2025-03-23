@@ -49,7 +49,6 @@ class AreaSeries<T, D> extends XyDataSeries<T, D> {
     super.trendlines,
     super.initialIsVisible,
     super.enableTooltip = true,
-    super.enableTrackball = true,
     super.dashArray,
     super.animationDuration,
     this.borderColor = Colors.transparent,

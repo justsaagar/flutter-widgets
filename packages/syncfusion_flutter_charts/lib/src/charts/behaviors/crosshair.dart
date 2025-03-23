@@ -321,7 +321,7 @@ class CrosshairBehavior extends ChartBehavior {
       }
     }
 
-    _show(parent);
+    _show();
   }
 
   /// Displays the crosshair at the specified point index.
@@ -357,10 +357,6 @@ class CrosshairBehavior extends ChartBehavior {
   /// (e.g., CrosshairBehavior, TrackballBehavior, ZoomingBehavior).
   @override
   void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
-    if (parentBox == null) {
-      return;
-    }
-
     if (event is PointerMoveEvent) {
       _handlePointerMove(event);
     } else if (event is PointerHoverEvent) {
@@ -371,13 +367,13 @@ class CrosshairBehavior extends ChartBehavior {
   }
 
   void _handlePointerMove(PointerMoveEvent details) {
-    if (parentBox != null && activationMode == ActivationMode.singleTap) {
+    if (activationMode == ActivationMode.singleTap) {
       _showCrosshair(parentBox!.globalToLocal(details.position));
     }
   }
 
   void _handlePointerHover(PointerHoverEvent details) {
-    if (parentBox != null && activationMode == ActivationMode.singleTap) {
+    if (activationMode == ActivationMode.singleTap) {
       _showCrosshair(parentBox!.globalToLocal(details.position));
     }
   }
@@ -385,7 +381,7 @@ class CrosshairBehavior extends ChartBehavior {
   /// Called when a pointer or mouse enter on the screen.
   @override
   void handlePointerEnter(PointerEnterEvent details) {
-    if (parentBox != null && activationMode == ActivationMode.singleTap) {
+    if (activationMode == ActivationMode.singleTap) {
       _showCrosshair(parentBox!.globalToLocal(details.position));
     }
   }
@@ -400,7 +396,7 @@ class CrosshairBehavior extends ChartBehavior {
   /// recognized in behavior.
   @override
   void handleLongPressStart(LongPressStartDetails details) {
-    if (parentBox != null && activationMode == ActivationMode.longPress) {
+    if (activationMode == ActivationMode.longPress) {
       _showCrosshair(parentBox!.globalToLocal(details.globalPosition));
     }
   }
@@ -409,7 +405,7 @@ class CrosshairBehavior extends ChartBehavior {
   /// recognized in behavior.
   @override
   void handleLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
-    if (parentBox != null && activationMode == ActivationMode.longPress) {
+    if (activationMode == ActivationMode.longPress) {
       _showCrosshair(parentBox!.globalToLocal(details.globalPosition));
     }
   }
@@ -424,7 +420,7 @@ class CrosshairBehavior extends ChartBehavior {
   /// Called when the pointer tap has contacted the screen in behavior.
   @override
   void handleTapDown(TapDownDetails details) {
-    if (parentBox != null && activationMode == ActivationMode.singleTap) {
+    if (activationMode == ActivationMode.singleTap) {
       _showCrosshair(parentBox!.globalToLocal(details.globalPosition));
     }
   }
@@ -438,7 +434,7 @@ class CrosshairBehavior extends ChartBehavior {
   /// Called when pointer tap has contacted the screen double time in behavior.
   @override
   void handleDoubleTap(Offset position) {
-    if (parentBox != null && activationMode == ActivationMode.doubleTap) {
+    if (activationMode == ActivationMode.doubleTap) {
       _showCrosshair(parentBox!.globalToLocal(position));
       _hideCrosshair(doubleTapHideDelay: 200);
     }
@@ -474,9 +470,14 @@ class CrosshairBehavior extends ChartBehavior {
     _horizontalLabelPositions.clear();
   }
 
-  void _show(RenderBehaviorArea parent) {
+  void _show() {
+    final RenderBehaviorArea? parent = parentBox as RenderBehaviorArea?;
+    if (_position == null || parent == null) {
+      return;
+    }
+
     final RenderCartesianAxes? cartesianAxes = parent.cartesianAxes;
-    if (_position == null || cartesianAxes == null) {
+    if (cartesianAxes == null) {
       return;
     }
 

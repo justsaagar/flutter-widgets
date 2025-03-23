@@ -70,7 +70,6 @@ abstract class ChartSeries<T, D>
     this.dataLabelMapper,
     this.name,
     this.enableTooltip = true,
-    this.enableTrackball = true,
     this.animationDuration = 1500,
     this.color,
     this.borderWidth = 2.0,
@@ -301,28 +300,6 @@ abstract class ChartSeries<T, D>
   /// }
   /// ```
   final bool enableTooltip;
-
-  /// Enables or disables the trackball for this series. Trackball will display more
-  /// details about data points when tapping the data point region.
-  ///
-  /// Defaults to `true`.
-  ///
-  /// ```dart
-  ///  Widget build(BuildContext context) {
-  ///   return SfCartesianChart(
-  ///     trackballBehavior: TrackballBehavior(
-  ///       enable: true,
-  ///     ),
-  ///     series: <CartesianSeries<_SalesData, String>>[
-  ///       LineSeries<_SalesData, String>(
-  ///         enableTrackball: false,
-  ///       ),
-  ///     ],
-  ///   );
-  /// }
-  /// ```
-
-  final bool enableTrackball;
 
   /// Duration of the series animation. It takes millisecond value as input.
   ///
@@ -723,7 +700,6 @@ abstract class ChartSeries<T, D>
       ..markerSettings = markerSettings
       ..name = name
       ..enableTooltip = enableTooltip
-      ..enableTrackball = enableTrackball
       ..animationDuration = animationDuration
       ..color = color
       ..borderWidth = borderWidth
@@ -759,7 +735,6 @@ abstract class ChartSeries<T, D>
       ..markerSettings = markerSettings
       ..name = name
       ..enableTooltip = enableTooltip
-      ..enableTrackball = enableTrackball
       ..animationDuration = animationDuration
       ..color = color
       ..borderWidth = borderWidth
@@ -790,7 +765,7 @@ abstract class ChartSeriesRenderer<T, D> extends RenderBox
     with
         SlottedContainerRenderObjectMixin<SeriesSlot, RenderBox>,
         ChartAreaUpdateMixin,
-        LegendItemProviderMixin {
+        LegendItemProvider {
   ChartSeriesRenderer() {
     _fetchMarkerImage();
   }
@@ -1025,14 +1000,6 @@ abstract class ChartSeriesRenderer<T, D> extends RenderBox
   set enableTooltip(bool value) {
     if (_enableTooltip != value) {
       _enableTooltip = value;
-    }
-  }
-
-  bool get enableTrackball => _enableTrackball;
-  bool _enableTrackball = true;
-  set enableTrackball(bool value) {
-    if (_enableTrackball != value) {
-      _enableTrackball = value;
     }
   }
 
@@ -1878,10 +1845,10 @@ abstract class ChartSeriesRenderer<T, D> extends RenderBox
 
     if (opacity != 1.0) {
       if (color != Colors.transparent) {
-        color = color.withValues(alpha: opacity);
+        color = color.withOpacity(opacity);
       }
       if (strokeColor != Colors.transparent) {
-        strokeColor = strokeColor.withValues(alpha: opacity);
+        strokeColor = strokeColor.withOpacity(opacity);
       }
     }
 
@@ -1893,12 +1860,12 @@ abstract class ChartSeriesRenderer<T, D> extends RenderBox
         final double opacity = effectiveSelectionBehavior!.selectedOpacity;
         color = effectiveSelectionBehavior!.selectedColor ?? color;
         if (color != Colors.transparent) {
-          color = color.withValues(alpha: opacity);
+          color = color.withOpacity(opacity);
         }
         strokeColor =
             effectiveSelectionBehavior!.selectedBorderColor ?? strokeColor;
         if (strokeColor != Colors.transparent) {
-          strokeColor = strokeColor.withValues(alpha: opacity);
+          strokeColor = strokeColor.withOpacity(opacity);
         }
         strokeWidth =
             effectiveSelectionBehavior!.selectedBorderWidth ?? strokeWidth;
@@ -1906,12 +1873,12 @@ abstract class ChartSeriesRenderer<T, D> extends RenderBox
         final double opacity = effectiveSelectionBehavior!.unselectedOpacity;
         color = effectiveSelectionBehavior!.unselectedColor ?? color;
         if (color != Colors.transparent) {
-          color = color.withValues(alpha: opacity);
+          color = color.withOpacity(opacity);
         }
         strokeColor =
             effectiveSelectionBehavior!.unselectedBorderColor ?? strokeColor;
         if (strokeColor != Colors.transparent) {
-          strokeColor = strokeColor.withValues(alpha: opacity);
+          strokeColor = strokeColor.withOpacity(opacity);
         }
         strokeWidth =
             effectiveSelectionBehavior!.unselectedBorderWidth ?? strokeWidth;
@@ -2999,7 +2966,6 @@ abstract class CartesianSeries<T, D> extends ChartSeries<T, D> {
     this.onCreateShader,
     super.initialIsVisible,
     super.enableTooltip = true,
-    super.enableTrackball = true,
     super.emptyPointSettings,
     super.dataLabelSettings,
     super.animationDuration,
@@ -3478,8 +3444,8 @@ abstract class CartesianSeriesRenderer<T, D> extends ChartSeriesRenderer<T, D>
   @override
   List<LegendItem>? buildLegendItems(int index) {
     final List<LegendItem>? items = super.buildLegendItems(index);
-    if (trendlineContainer != null && items != null) {
-      items.addAll(trendlineContainer!.buildLegendItems(index, this)!);
+    if (trendlineContainer != null) {
+      items!.addAll(trendlineContainer!.buildLegendItems(index, this)!);
     }
     return items;
   }
@@ -5122,38 +5088,14 @@ mixin CartesianRealTimeUpdateMixin<T, D> on CartesianSeriesRenderer<T, D> {
 
   void _removeXValueAt(int index) {
     _chaoticRawXValues.removeAt(index);
-    if (index < xRawValues.length) {
+    if (xRawValues.length > index) {
       xRawValues.removeAt(index);
     }
 
-    // For category type axis, the _chaoticXValues and xValues fields contain
-    // index values and the x-axis range updated by xValues. Here, the last
-    // index is removed from the list from _chaoticXValues and xValues to
-    // update the x-axis range correctly.
-    //
-    // Example: If a data source initially has four data points and the value
-    // stored in _chaoticXValues and xValues list for a category-type axis is
-    // [0, 1, 2, 3] and x-axis range min and max value was calculated based on
-    // xValues. If a data point is removed using the remove data points method,
-    // the corresponding value is removed from the xRawValues list and the data
-    // points length reduced from four to three, and by removing the last index
-    // the _chaoticXValues and xValues list is updated to [0, 1, 2] and x-axis
-    // range was updated correctly with min value as 0 and max value as 2.
-    if (xAxis is RenderCategoryAxis || xAxis is RenderDateTimeCategoryAxis) {
-      // If add and remove operations on data points are performed simultaneously,
-      // the values of _chaoticXValues and xValues remain the same, and the range
-      // is not updated. To resolve this, _isXRangeChanged is set to true for
-      // category-type axes.
-      _isXRangeChanged = true;
-      _chaoticXValues.removeLast();
-      if (index < xValues.length) {
-        xValues.removeLast();
-      }
-    } else {
-      _chaoticXValues.removeAt(index);
-      if (index < xValues.length) {
-        xValues.removeAt(index);
-      }
+    _chaoticXValues.removeAt(index);
+    // TODO(VijayakumarM): Check with category axis.
+    if (xValues.length > index) {
+      xValues.removeAt(index);
     }
   }
 
@@ -5756,7 +5698,6 @@ abstract class XyDataSeries<T, D> extends CartesianSeries<T, D> {
     super.markerSettings,
     super.initialIsVisible,
     super.enableTooltip = true,
-    super.enableTrackball = true,
     super.emptyPointSettings,
     super.dataLabelSettings,
     super.animationDuration,
@@ -6039,7 +5980,6 @@ abstract class StackedSeriesBase<T, D> extends XyDataSeries<T, D> {
     this.isTrackVisible = false,
     super.trendlines,
     super.enableTooltip = true,
-    super.enableTrackball = true,
     super.animationDuration,
     super.borderWidth,
     super.selectionBehavior,
@@ -6336,6 +6276,7 @@ abstract class StackedSeriesRenderer<T, D> extends XyDataSeriesRenderer<T, D>
     String groupName,
   ) {
     final String seriesType = current.runtimeType.toString().toLowerCase();
+    final bool isStackedArea = seriesType.contains('stackedarea');
     final bool isStackedLine = seriesType.contains('stackedline');
     final EmptyPointMode emptyPointMode = current.emptyPointSettings.mode;
     final bool isDropOrGapMode = emptyPointMode == EmptyPointMode.drop ||
@@ -6393,7 +6334,7 @@ abstract class StackedSeriesRenderer<T, D> extends XyDataSeriesRenderer<T, D>
       }
 
       num stackValue = 0;
-      if (yValue >= 0) {
+      if (isStackedArea || yValue >= 0) {
         if (currentPositiveStackInfo!.stackingValues.containsKey(xValue)) {
           stackValue = currentPositiveStackInfo.stackingValues[xValue]!;
           currentPositiveStackInfo.stackingValues[xValue] = stackValue + yValue;
@@ -6462,6 +6403,7 @@ abstract class StackedSeriesRenderer<T, D> extends XyDataSeriesRenderer<T, D>
       }
 
       final String seriesType = current.runtimeType.toString().toLowerCase();
+      final bool isContainsStackedArea = seriesType.contains('stackedarea');
       final bool isContainsStackedArea100 =
           seriesType.contains('stackedarea100');
       final String groupName =
@@ -6496,7 +6438,7 @@ abstract class StackedSeriesRenderer<T, D> extends XyDataSeriesRenderer<T, D>
         }
 
         if (stackingInfo!.stackingValues.containsKey(xValue)) {
-          if (yValue >= 0) {
+          if (isContainsStackedArea || yValue >= 0) {
             stackingInfo.stackingValues[xValue] =
                 stackingInfo.stackingValues[xValue]! + yValue;
           } else {
@@ -6711,7 +6653,6 @@ abstract class RangeSeriesBase<T, D> extends CartesianSeries<T, D> {
     super.markerSettings,
     super.initialIsVisible,
     super.enableTooltip = true,
-    super.enableTrackball = true,
     super.emptyPointSettings,
     super.dataLabelSettings,
     super.animationDuration,
@@ -7168,7 +7109,6 @@ abstract class FinancialSeriesBase<T, D> extends CartesianSeries<T, D> {
     super.initialIsVisible,
     super.gradient,
     super.enableTooltip = true,
-    super.enableTrackball = true,
     super.animationDuration,
     super.borderWidth = 2,
     super.selectionBehavior,
@@ -7738,7 +7678,6 @@ abstract class CircularSeries<T, D> extends ChartSeries<T, D> {
     super.legendItemText,
     super.sortFieldValueMapper,
     super.enableTooltip = true,
-    super.enableTrackball = true,
     super.emptyPointSettings,
     super.dataLabelSettings,
     super.animationDuration,
@@ -8949,22 +8888,12 @@ abstract class CircularSeriesRenderer<T, D> extends ChartSeriesRenderer<T, D>
 
   @nonVirtual
   void updateSegmentGradient(ChartSegment segment) {
-    final int segmentIndex = segment.currentSegmentIndex;
-
-    // This method is called by the data source setter before updating the
-    // segments, when the data source is updated dynamically. As a result,
-    // the length of the data source is updated while the length of the
-    // segments is not updated, which can lead to a range error exception.
-    // To prevent this, a condition has been added to ensure the segmentIndex
-    // is less than the data source length.
-    if (!segment.isEmpty &&
-        dataSource != null &&
-        segmentIndex < dataSource!.length) {
+    if (!segment.isEmpty) {
       if (pointShaderMapper != null) {
         final Shader shader = pointShaderMapper!(
-            dataSource![segmentIndex],
-            segmentIndex,
-            palette[segmentIndex % palette.length],
+            dataSource![segment.currentSegmentIndex],
+            segment.currentSegmentIndex,
+            palette[segment.currentSegmentIndex % palette.length],
             Rect.fromCircle(center: center, radius: currentRadius));
         segment.fillPaint.shader = shader;
       } else if (onCreateShader != null) {

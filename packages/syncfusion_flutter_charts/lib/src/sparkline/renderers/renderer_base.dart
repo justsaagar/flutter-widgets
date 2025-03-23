@@ -11,7 +11,7 @@ import '../utils/helper.dart';
 abstract class SfSparkChartRenderObjectWidget extends LeafRenderObjectWidget {
   /// Creates the render object for spark chart.
   const SfSparkChartRenderObjectWidget(
-      {Key? key,
+      {super.key,
       this.data,
       this.dataCount,
       this.xValueMapper,
@@ -31,8 +31,7 @@ abstract class SfSparkChartRenderObjectWidget extends LeafRenderObjectWidget {
       this.sparkChartDataDetails,
       this.themeData,
       this.dataPoints,
-      this.coordinatePoints})
-      : super(key: key);
+      this.coordinatePoints});
 
   /// Specifies the data source for the series.
   final List<dynamic>? data;
@@ -594,46 +593,31 @@ abstract class RenderSparkChart extends RenderBox {
 
   /// Methods to calculate the visible points.
   void calculateRenderingPoints() {
-    if (minX == null ||
-        maxX == null ||
-        minY == null ||
-        maxY == null ||
-        dataPoints == null ||
-        areaSize == null) {
-      return;
-    }
+    if (minX != null && maxX != null && minY != null && maxY != null) {
+      diffX = maxX! - minX!;
+      diffY = maxY! - minY!;
+      axisHeight = getAxisHeight();
+      if (coordinatePoints!.isNotEmpty) {
+        coordinatePoints!.clear();
+      }
 
-    diffX = maxX! - minX!;
-    diffY = maxY! - minY!;
-    axisHeight = getAxisHeight();
-    if (coordinatePoints!.isNotEmpty) {
-      coordinatePoints!.clear();
-    }
+      double x;
+      double y;
+      Offset visiblePoint;
 
-    double x;
-    double y;
-    Offset visiblePoint;
-
-    for (int i = 0; i < dataPoints!.length; i++) {
-      x = dataPoints![i].x.toDouble();
-      y = dataPoints![i].y.toDouble();
-      visiblePoint = transformToCoordinatePoint(minX!, maxX!, minY!, maxY!,
-          diffX!, diffY!, areaSize!, x, y, dataPoints!.length);
-      coordinatePoints!.add(visiblePoint);
+      for (int i = 0; i < dataPoints!.length; i++) {
+        x = dataPoints![i].x.toDouble();
+        y = dataPoints![i].y.toDouble();
+        visiblePoint = transformToCoordinatePoint(minX!, maxX!, minY!, maxY!,
+            diffX!, diffY!, areaSize!, x, y, dataPoints!.length);
+        coordinatePoints!.add(visiblePoint);
+      }
+      coordinatePoints = sortScreenCoordinatePoints(coordinatePoints!);
     }
-    coordinatePoints = sortScreenCoordinatePoints(coordinatePoints!);
   }
 
   /// Method to calculate the plot band position.
   void calculatePlotBandPosition() {
-    if (minX == null ||
-        maxX == null ||
-        minY == null ||
-        maxY == null ||
-        areaSize == null) {
-      return;
-    }
-
     final double height = areaSize!.height;
     final double? start = plotBand == null
         ? 0
@@ -671,12 +655,6 @@ abstract class RenderSparkChart extends RenderBox {
 
   /// Method to render plot band.
   void renderPlotBand(Canvas canvas, Offset offset) {
-    if (plotBandStartHeight == null ||
-        plotBandEndHeight == null ||
-        areaSize == null) {
-      return;
-    }
-
     if (plotBandStartHeight != plotBandEndHeight) {
       final Paint paint = Paint()..color = plotBand!.color;
       final Rect plotBandRect = Rect.fromLTRB(
@@ -685,7 +663,7 @@ abstract class RenderSparkChart extends RenderBox {
           offset.dx + areaSize!.width,
           offset.dy + plotBandEndHeight!);
       if (plotBandRect.top >= sparkChartAreaRect!.top &&
-          plotBandRect.bottom <= sparkChartAreaRect!.bottom) {
+          plotBandRect.bottom >= sparkChartAreaRect!.bottom) {
         canvas.drawRect(plotBandRect, paint);
         if (plotBand!.borderColor != Colors.transparent &&
             plotBand!.borderWidth > 0) {

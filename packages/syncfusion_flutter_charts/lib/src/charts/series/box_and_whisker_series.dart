@@ -49,7 +49,6 @@ class BoxAndWhiskerSeries<T, D> extends CartesianSeries<T, D> {
     super.dataLabelSettings,
     super.initialIsVisible,
     super.enableTooltip = true,
-    super.enableTrackball = true,
     super.animationDuration,
     this.borderColor,
     super.borderWidth = 1.0,
@@ -1128,7 +1127,7 @@ class BoxAndWhiskerSegment<T, D> extends ChartSegment {
       // by 4 to get the animation factor for mean line.
       final double opacity = (animationFactor - 0.75) * 4.0;
       final Paint meanPaint = Paint()
-        ..color = strokePaint.color.withValues(alpha: opacity)
+        ..color = strokePaint.color.withOpacity(opacity)
         ..strokeWidth = strokePaint.strokeWidth
         ..shader = strokePaint.shader
         ..style = strokePaint.style

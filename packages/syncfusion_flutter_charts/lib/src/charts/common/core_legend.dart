@@ -10,7 +10,6 @@ import 'package:syncfusion_flutter_core/core.dart' as shape_helper;
 import 'package:syncfusion_flutter_core/core.dart';
 
 import '../utils/helper.dart';
-import 'element_widget.dart';
 
 /// Callback which is used to generate a widget legend item.
 typedef LegendItemBuilder = Widget Function(BuildContext context, int index);
@@ -129,7 +128,7 @@ enum LegendScrollbarVisibility {
 }
 
 /// The legend provider.
-mixin LegendItemProviderMixin {
+abstract class LegendItemProvider {
   /// Builds the legend item.
   List<LegendItem>? buildLegendItems(int index);
 
@@ -242,7 +241,7 @@ class LegendItem {
 class LegendLayout extends StatefulWidget {
   /// Constructor for the [LegendLayout].
   const LegendLayout({
-    Key? key,
+    super.key,
     this.showLegend = false,
     this.padding = const EdgeInsets.all(10),
     this.backgroundImage,
@@ -284,7 +283,7 @@ class LegendLayout extends StatefulWidget {
     this.onTouchMove,
     this.onTouchUp,
     required this.child,
-  }) : super(key: key);
+  });
 
   /// Specifies whether to shows or hides the legend.
   final bool showLegend;
@@ -449,8 +448,8 @@ class LegendLayoutState extends State<LegendLayout> {
       final RenderObject? renderObject = legendElement.findRenderObject();
       if (renderObject != null &&
           renderObject.attached &&
-          renderObject is CustomRenderConstrainedLayoutBuilder) {
-        renderObject.markNeedsBuild();
+          renderObject is RenderConstrainedLayoutBuilder) {
+        // renderObject.markNeedsBuild();
       }
     }
   }
@@ -467,7 +466,7 @@ class LegendLayoutState extends State<LegendLayout> {
   @override
   Widget build(BuildContext context) {
     final Widget? legend = widget.showLegend
-        ? CustomLayoutBuilder(
+        ? LayoutBuilder(
             key: _legendKey,
             builder: (BuildContext context, BoxConstraints constraints) {
               return _buildLegend();
@@ -538,7 +537,6 @@ enum _LegendSlot { legendTitle, legend, plotArea }
 class _LegendLayoutHandler
     extends SlottedMultiChildRenderObjectWidget<_LegendSlot, RenderBox> {
   const _LegendLayoutHandler({
-    Key? key,
     this.onTouchDown,
     this.onTouchMove,
     this.onTouchUp,
@@ -560,7 +558,7 @@ class _LegendLayoutHandler
     required this.legendTitle,
     required this.legend,
     required this.plotArea,
-  }) : super(key: key);
+  });
 
   final Function(Offset)? onTouchDown;
   final Function(Offset)? onTouchMove;
@@ -1659,7 +1657,7 @@ class _IconTextState extends State<_IconText>
     Widget current = CustomPaint(
       size: widget.iconSize,
       painter: _LegendIconShape(
-        color: details.color!.withValues(alpha: widget.iconOpacity),
+        color: details.color!.withOpacity(widget.iconOpacity),
         iconType: details.iconType,
         iconBorderColor: details.iconBorderColor,
         iconBorderWidth: details.iconBorderWidth,
@@ -1867,8 +1865,8 @@ class _IconTextState extends State<_IconText>
                   details.text,
                   style: widget.textStyle.copyWith(
                     color: widget.textStyle.foreground == null
-                        ? widget.textStyle.color!.withValues(
-                            alpha: _opacityTween.evaluate(_toggleAnimation))
+                        ? widget.textStyle.color!.withOpacity(
+                            _opacityTween.evaluate(_toggleAnimation))
                         : widget.textStyle.foreground!.color,
                   ),
                 )

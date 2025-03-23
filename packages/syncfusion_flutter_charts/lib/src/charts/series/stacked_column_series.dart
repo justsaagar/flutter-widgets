@@ -61,7 +61,6 @@ class StackedColumnSeries<T, D> extends StackedSeriesBase<T, D> {
     super.gradient,
     super.borderGradient,
     super.enableTooltip = true,
-    super.enableTrackball = true,
     super.animationDuration,
     this.borderColor = Colors.transparent,
     super.borderWidth,

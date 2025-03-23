@@ -17,7 +17,6 @@ import 'behaviors/zooming.dart';
 import 'common/annotation.dart';
 import 'common/callbacks.dart';
 import 'common/core_legend.dart';
-import 'common/element_widget.dart';
 import 'common/legend.dart';
 import 'indicators/accumulation_distribution_indicator.dart';
 import 'indicators/atr_indicator.dart';
@@ -485,7 +484,7 @@ class RenderChartArea extends RenderBox
   }
 
   bool _isCartesianAxesHit(Offset globalPosition) {
-    if (_cartesianAxes != null && attached) {
+    if (_cartesianAxes != null) {
       return true;
     }
     return false;
@@ -500,7 +499,7 @@ class RenderChartArea extends RenderBox
   }
 
   bool _isBehaviorAreaHit(Offset globalPosition) {
-    if (_behaviorArea != null && attached) {
+    if (_behaviorArea != null) {
       return true;
     }
     return false;
@@ -508,9 +507,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handlePointerEnter(PointerEnterEvent details) {
-    if (!attached) {
-      return;
-    }
     if (_isBehaviorAreaHit(details.position)) {
       _behaviorArea!.handlePointerEnter(details);
     }
@@ -518,9 +514,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handlePointerDown(PointerDownEvent details) {
-    if (!attached) {
-      return;
-    }
     onChartTouchInteractionDown?.call(ChartTouchInteractionArgs()
       ..position = globalToLocal(details.position));
     if (_isPlotAreaHit(details.position)) {
@@ -534,18 +527,12 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handlePointerMove(PointerMoveEvent details) {
-    if (!attached) {
-      return;
-    }
     onChartTouchInteractionMove?.call(ChartTouchInteractionArgs()
       ..position = globalToLocal(details.position));
   }
 
   @protected
   void _handlePointerHover(PointerHoverEvent details) {
-    if (!attached) {
-      return;
-    }
     if (_isCartesianAxesHit(details.position)) {
       _cartesianAxes?.visitChildren((RenderObject child) {
         if (child is RenderChartAxis) {
@@ -569,9 +556,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handlePointerUp(PointerUpEvent details) {
-    if (!attached) {
-      return;
-    }
     onChartTouchInteractionUp?.call(ChartTouchInteractionArgs()
       ..position = globalToLocal(details.position));
     if (_isPlotAreaHit(details.position)) {
@@ -585,9 +569,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handlePointerExit(PointerExitEvent details) {
-    if (!attached) {
-      return;
-    }
     if (_isBehaviorAreaHit(details.position)) {
       _behaviorArea?.handlePointerExit(details);
     }
@@ -595,9 +576,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handleLongPressStart(LongPressStartDetails details) {
-    if (!attached) {
-      return;
-    }
     if (_isPlotAreaHit(details.globalPosition)) {
       _plotArea!.isTooltipActivated = false;
       RenderBox? child = _plotArea?.lastChild;
@@ -617,9 +595,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handleLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
-    if (!attached) {
-      return;
-    }
     if (_isBehaviorAreaHit(details.globalPosition)) {
       _behaviorArea?.handleLongPressMoveUpdate(details);
     }
@@ -627,9 +602,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handleLongPressEnd(LongPressEndDetails details) {
-    if (!attached) {
-      return;
-    }
     if (_isBehaviorAreaHit(details.globalPosition)) {
       _behaviorArea?.handleLongPressEnd(details);
     }
@@ -637,9 +609,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handleTapDown(TapDownDetails details) {
-    if (!attached) {
-      return;
-    }
     if (_isBehaviorAreaHit(details.globalPosition)) {
       _behaviorArea?.handleTapDown(details);
     }
@@ -647,9 +616,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handleTapUp(TapUpDetails details) {
-    if (!attached) {
-      return;
-    }
     if (_isCartesianAxesHit(details.globalPosition)) {
       _cartesianAxes?.visitChildren((RenderObject child) {
         if (child is RenderChartAxis) {
@@ -675,15 +641,12 @@ class RenderChartArea extends RenderBox
   }
 
   void _handleDoubleTapDown(TapDownDetails details) {
-    if (!attached) {
-      return;
-    }
     _doubleTapPosition = details.globalPosition;
   }
 
   @protected
   void _handleDoubleTap() {
-    if (_doubleTapPosition == null || !attached) {
+    if (_doubleTapPosition == null) {
       return;
     }
     if (_isPlotAreaHit(_doubleTapPosition!)) {
@@ -705,17 +668,11 @@ class RenderChartArea extends RenderBox
   }
 
   void _handleDoubleTapCancel() {
-    if (!attached) {
-      return;
-    }
     _doubleTapPosition = null;
   }
 
   @protected
   void _handleScaleStart(ScaleStartDetails details) {
-    if (!attached) {
-      return;
-    }
     if (_isBehaviorAreaHit(details.focalPoint)) {
       _isScaled = true;
       _behaviorArea?.handleScaleStart(details);
@@ -724,9 +681,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handleScaleUpdate(ScaleUpdateDetails details) {
-    if (!attached) {
-      return;
-    }
     if (_isPlotAreaHit(details.focalPoint)) {
       _plotArea?.visitChildren((RenderObject child) {
         if (child is ChartSeriesRenderer) {
@@ -742,9 +696,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handleScaleEnd(ScaleEndDetails details) {
-    if (!attached) {
-      return;
-    }
     if (_isScaled) {
       _isScaled = false;
       _behaviorArea?.handleScaleEnd(details);
@@ -753,9 +704,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handleHorizontalDragStart(DragStartDetails details) {
-    if (!attached) {
-      return;
-    }
     if (_isBehaviorAreaHit(details.globalPosition)) {
       _isPanned = true;
       _behaviorArea!.handleHorizontalDragStart(details);
@@ -764,9 +712,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handleHorizontalDragUpdate(DragUpdateDetails details) {
-    if (!attached) {
-      return;
-    }
     if (_isBehaviorAreaHit(details.globalPosition)) {
       _isPanned = true;
       _behaviorArea!.handleHorizontalDragUpdate(details);
@@ -775,9 +720,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handleHorizontalDragEnd(DragEndDetails details) {
-    if (!attached) {
-      return;
-    }
     if (_isPanned) {
       _isPanned = false;
       _behaviorArea!.handleHorizontalDragEnd(details);
@@ -786,9 +728,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handleVerticalDragStart(DragStartDetails details) {
-    if (!attached) {
-      return;
-    }
     if (_isBehaviorAreaHit(details.globalPosition)) {
       _isPanned = true;
       _behaviorArea!.handleVerticalDragStart(details);
@@ -797,9 +736,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handleVerticalDragUpdate(DragUpdateDetails details) {
-    if (!attached) {
-      return;
-    }
     if (_isBehaviorAreaHit(details.globalPosition)) {
       _isPanned = true;
       _behaviorArea!.handleVerticalDragUpdate(details);
@@ -808,9 +744,6 @@ class RenderChartArea extends RenderBox
 
   @protected
   void _handleVerticalDragEnd(DragEndDetails details) {
-    if (!attached) {
-      return;
-    }
     if (_isPanned) {
       _isPanned = false;
       _behaviorArea!.handleVerticalDragEnd(details);
@@ -1354,7 +1287,7 @@ class RenderChartPlotArea extends RenderStack with ChartAreaUpdateMixin {
     int index = 0;
     final List<LegendItem> legendItems = <LegendItem>[];
     visitChildren((RenderObject child) {
-      final LegendItemProviderMixin provider = child as LegendItemProviderMixin;
+      final LegendItemProvider provider = child as LegendItemProvider;
       final List<LegendItem>? items = provider.buildLegendItems(index);
       if (items != null) {
         legendItems.addAll(items);
@@ -2060,10 +1993,6 @@ class RenderCartesianAxes extends RenderBox
         firstChild!.parentData! as CartesianAxesParentData;
     final String primaryXAxisName = firstChild!.name ?? primaryXAxisDefaultName;
     firstChild!.name = primaryXAxisName;
-    // Sets isXAxis value defaults to true for primaryXAxis here because its
-    // value changed while adding multiple axes to the axes collection and maps
-    // series with different x axis instead of primary axis.
-    firstChild!.isXAxis = true;
 
     assert(firstChildParentData.nextSibling != null);
     final RenderChartAxis primaryYAxis = firstChildParentData.nextSibling!;
@@ -2780,7 +2709,7 @@ class RenderIndicatorArea extends RenderBox
     int index = 0;
     final List<LegendItem> legendItems = <LegendItem>[];
     visitChildren((RenderObject child) {
-      final LegendItemProviderMixin provider = child as LegendItemProviderMixin;
+      final LegendItemProvider provider = child as LegendItemProvider;
       final List<LegendItem>? items = provider.buildLegendItems(index);
       if (items != null) {
         legendItems.addAll(items);
@@ -3224,7 +3153,7 @@ class RenderCircularAnnotationArea extends RenderStack
   }
 }
 
-class LoadingIndicator extends CustomConstrainedLayoutBuilder<BoxConstraints> {
+class LoadingIndicator extends ConstrainedLayoutBuilder<BoxConstraints> {
   const LoadingIndicator({
     super.key,
     required this.isTransposed,
@@ -3257,7 +3186,7 @@ class LoadingIndicator extends CustomConstrainedLayoutBuilder<BoxConstraints> {
 }
 
 class RenderLoadingIndicator extends RenderProxyBox
-    with CustomRenderConstrainedLayoutBuilder<BoxConstraints, RenderBox> {
+    with RenderConstrainedLayoutBuilder<BoxConstraints, RenderBox> {
   bool _isDesktop = false;
   Offset _startPosition = Offset.zero;
   Offset _endPosition = Offset.zero;
@@ -3292,16 +3221,10 @@ class RenderLoadingIndicator extends RenderProxyBox
   }
 
   void handleScaleStart(ScaleStartDetails details) {
-    if (!attached) {
-      return;
-    }
     _startPosition = globalToLocal(details.focalPoint);
   }
 
   void handleScaleUpdate(ScaleUpdateDetails details) {
-    if (!attached) {
-      return;
-    }
     _endPosition = globalToLocal(details.focalPoint);
   }
 
@@ -3310,16 +3233,10 @@ class RenderLoadingIndicator extends RenderProxyBox
   }
 
   void handleDragStart(DragStartDetails details) {
-    if (!attached) {
-      return;
-    }
     _startPosition = globalToLocal(details.globalPosition);
   }
 
   void handleDragUpdate(DragUpdateDetails details) {
-    if (!attached) {
-      return;
-    }
     _endPosition = globalToLocal(details.globalPosition);
   }
 
@@ -3397,7 +3314,7 @@ class RenderLoadingIndicator extends RenderProxyBox
       }
     }
     if (buildLoadMoreIndicator) {
-      markNeedsBuild();
+      // markNeedsBuild();
     }
   }
 

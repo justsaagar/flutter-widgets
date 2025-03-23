@@ -50,7 +50,6 @@ class ColumnSeries<T, D> extends XyDataSeries<T, D> {
     super.gradient,
     super.borderGradient,
     super.enableTooltip = true,
-    super.enableTrackball = true,
     super.animationDuration,
     this.trackColor = Colors.grey,
     this.trackBorderColor = Colors.transparent,

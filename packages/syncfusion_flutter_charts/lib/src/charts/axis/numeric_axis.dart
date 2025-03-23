@@ -46,8 +46,6 @@ class NumericAxis extends ChartAxis {
     super.edgeLabelPlacement,
     super.labelStyle,
     super.plotOffset,
-    super.plotOffsetStart,
-    super.plotOffsetEnd,
     super.initialZoomFactor,
     super.initialZoomPosition,
     super.enableAutoIntervalOnZooming,

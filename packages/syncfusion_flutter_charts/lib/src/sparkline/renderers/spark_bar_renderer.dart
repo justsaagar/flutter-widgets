@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_core/theme.dart';
-import '../plot_band.dart';
 import '../utils/enum.dart';
 import '../utils/helper.dart';
 import 'renderer_base.dart';
@@ -9,53 +7,31 @@ import 'renderer_base.dart';
 class SfSparkBarChartRenderObjectWidget extends SfSparkChartRenderObjectWidget {
   /// Creates the render object for spark chart.
   const SfSparkBarChartRenderObjectWidget(
-      {Key? key,
+      {super.key,
       this.borderWidth,
       this.borderColor,
-      List<dynamic>? data,
-      int? dataCount,
-      SparkChartIndexedValueMapper<dynamic>? xValueMapper,
-      SparkChartIndexedValueMapper<num>? yValueMapper,
-      bool? isInversed,
-      double? axisCrossesAt,
-      Color? axisLineColor,
-      double? axisLineWidth,
-      List<double>? axisLineDashArray,
-      Color? firstPointColor,
-      Color? lowPointColor,
-      Color? highPointColor,
-      Color? lastPointColor,
-      Color? negativePointColor,
-      Color? color,
-      SparkChartPlotBand? plotBand,
+      super.data,
+      super.dataCount,
+      super.xValueMapper,
+      super.yValueMapper,
+      super.isInversed,
+      super.axisCrossesAt,
+      super.axisLineColor,
+      super.axisLineWidth,
+      super.axisLineDashArray,
+      super.firstPointColor,
+      super.lowPointColor,
+      super.highPointColor,
+      super.lastPointColor,
+      super.negativePointColor,
+      super.color,
+      super.plotBand,
       this.labelDisplayMode,
       this.labelStyle,
-      SfSparkChartThemeData? themeData,
-      SparkChartDataDetails? sparkChartDataDetails,
-      List<Offset>? coordinatePoints,
-      List<SparkChartPoint>? dataPoints})
-      : super(
-            key: key,
-            data: data,
-            dataCount: dataCount,
-            xValueMapper: xValueMapper,
-            yValueMapper: yValueMapper,
-            isInversed: isInversed,
-            axisCrossesAt: axisCrossesAt,
-            axisLineColor: axisLineColor,
-            axisLineWidth: axisLineWidth,
-            axisLineDashArray: axisLineDashArray,
-            firstPointColor: firstPointColor,
-            lowPointColor: lowPointColor,
-            highPointColor: highPointColor,
-            lastPointColor: lastPointColor,
-            negativePointColor: negativePointColor,
-            color: color,
-            plotBand: plotBand,
-            sparkChartDataDetails: sparkChartDataDetails,
-            themeData: themeData,
-            coordinatePoints: coordinatePoints,
-            dataPoints: dataPoints);
+      super.themeData,
+      super.sparkChartDataDetails,
+      super.coordinatePoints,
+      super.dataPoints});
 
   /// Specifies the bar chart border width.
   final double? borderWidth;
@@ -134,56 +110,35 @@ class SfSparkBarChartRenderObjectWidget extends SfSparkChartRenderObjectWidget {
 class _RenderSparkBarChart extends RenderSparkChart {
   /// Creates the render object widget.
   _RenderSparkBarChart(
-      {List<dynamic>? data,
-      int? dataCount,
-      SparkChartIndexedValueMapper<dynamic>? xValueMapper,
-      SparkChartIndexedValueMapper<num>? yValueMapper,
-      bool? isInversed,
-      double? axisCrossesAt,
-      double? axisLineWidth,
-      Color? axisLineColor,
-      List<double>? axisLineDashArray,
-      Color? color,
-      Color? firstPointColor,
-      Color? lastPointColor,
-      Color? highPointColor,
-      Color? lowPointColor,
-      Color? negativePointColor,
-      SparkChartPlotBand? plotBand,
+      {super.data,
+      super.dataCount,
+      super.xValueMapper,
+      super.yValueMapper,
+      super.isInversed,
+      super.axisCrossesAt,
+      super.axisLineWidth,
+      super.axisLineColor,
+      super.axisLineDashArray,
+      super.color,
+      super.firstPointColor,
+      super.lastPointColor,
+      super.highPointColor,
+      super.lowPointColor,
+      super.negativePointColor,
+      super.plotBand,
       double? borderWidth,
       Color? borderColor,
       SparkChartLabelDisplayMode? labelDisplayMode,
       TextStyle? labelStyle,
-      SparkChartDataDetails? sparkChartDataDetails,
-      SfSparkChartThemeData? themeData,
-      List<Offset>? coordinatePoints,
-      List<SparkChartPoint>? dataPoints})
+      super.sparkChartDataDetails,
+      super.themeData,
+      super.coordinatePoints,
+      super.dataPoints})
       : _borderWidth = borderWidth,
         _borderColor = borderColor,
         _labelDisplayMode = labelDisplayMode,
         _labelStyle = labelStyle,
-        _axisCrossesAt = axisCrossesAt,
-        super(
-            data: data,
-            dataCount: dataCount,
-            xValueMapper: xValueMapper,
-            yValueMapper: yValueMapper,
-            isInversed: isInversed,
-            axisCrossesAt: axisCrossesAt,
-            axisLineWidth: axisLineWidth,
-            axisLineColor: axisLineColor,
-            axisLineDashArray: axisLineDashArray,
-            color: color,
-            firstPointColor: firstPointColor,
-            lastPointColor: lastPointColor,
-            highPointColor: highPointColor,
-            lowPointColor: lowPointColor,
-            negativePointColor: negativePointColor,
-            plotBand: plotBand,
-            sparkChartDataDetails: sparkChartDataDetails,
-            themeData: themeData,
-            coordinatePoints: coordinatePoints,
-            dataPoints: dataPoints);
+        _axisCrossesAt = axisCrossesAt;
 
   /// Defines the border width.
   double? _borderWidth;
@@ -269,18 +224,10 @@ class _RenderSparkBarChart extends RenderSparkChart {
 
   @override
   void calculateRenderingPoints() {
-    if (minX == null ||
-        maxX == null ||
-        minY == null ||
-        maxY == null ||
-        dataPoints == null ||
-        areaSize == null) {
-      return;
-    }
-
     diffX = maxX! - minX!;
     diffY = maxY! - minY!;
     diffX = diffX == 0 ? 1 : diffX;
+    diffY = diffY == 0 ? 1 : diffY;
 
     _segments = <Rect>[];
     final double xInterval = dataPoints!.length > 1
@@ -295,7 +242,6 @@ class _RenderSparkBarChart extends RenderSparkChart {
     double columnWidth = areaSize!.width / (((maxX! - minX!) / xInterval) + 1);
     columnWidth -= space;
     diffY = maxY! - axisBaseValue!;
-    diffY = diffY == 0 ? 1 : diffY;
     axisHeight = getAxisHeight();
     if (coordinatePoints!.isNotEmpty) {
       coordinatePoints!.clear();
@@ -351,14 +297,6 @@ class _RenderSparkBarChart extends RenderSparkChart {
   /// Method to calculate the plot band position.
   @override
   void calculatePlotBandPosition() {
-    if (minX == null ||
-        maxX == null ||
-        minY == null ||
-        maxY == null ||
-        areaSize == null) {
-      return;
-    }
-
     final double height = areaSize!.height;
     final double start =
         (plotBand!.start ?? minY!) < minY! ? minY! : (plotBand!.start ?? minY!);

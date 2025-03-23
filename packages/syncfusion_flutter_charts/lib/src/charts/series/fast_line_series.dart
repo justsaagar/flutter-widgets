@@ -55,7 +55,6 @@ class FastLineSeries<T, D> extends XyDataSeries<T, D> {
     super.initialIsVisible,
     super.name,
     super.enableTooltip = true,
-    super.enableTrackball = true,
     super.animationDuration,
     super.selectionBehavior,
     super.isVisibleInLegend,

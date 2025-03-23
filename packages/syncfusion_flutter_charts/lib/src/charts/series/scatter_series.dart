@@ -39,7 +39,6 @@ class ScatterSeries<T, D> extends XyDataSeries<T, D> {
     super.initialIsVisible,
     super.dataLabelSettings,
     super.enableTooltip = true,
-    super.enableTrackball = true,
     super.trendlines,
     super.animationDuration,
     this.borderColor = Colors.transparent,
